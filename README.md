@@ -1,4 +1,4 @@
-# Terraform Infrastructure
+# Terraform Infrastructure with VNET module
 
 This repository contains infrastructure-as-code for managing Azure resources using Terraform. It includes reusable modules and environment-specific configurations.
 
