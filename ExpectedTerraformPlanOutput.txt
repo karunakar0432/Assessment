@@ -1,0 +1,93 @@
+Assuming running the module using: 
+terraform plan -var-file="envs/dev/environment.tfvars"
+
+with below configurations:
+resource_group_name = "dev-network-rg"
+location            = "eastus"
+vnet_name           = "dev-vnet"
+vnet_address_space  = ["10.0.0.0/16"]
+
+subnets = [
+  {
+    name             = "dev-subnet-1"
+    address_prefixes = ["10.0.1.0/24"]
+  },
+  {
+    name             = "dev-subnet-2"
+    address_prefixes = ["10.0.2.0/24"]
+  }
+]
+
+
+The expected terraform plan output can be:
+Terraform will perform the following actions:
+
+  # azurerm_resource_group.rg will be created
+  + resource "azurerm_resource_group" "rg" {
+      + id       = (known after apply)
+      + location = "eastus"
+      + name     = "dev-network-rg"
+    }
+
+  # azurerm_virtual_network.vnet will be created
+  + resource "azurerm_virtual_network" "vnet" {
+      + address_space       = ["10.0.0.0/16"]
+      + id                  = (known after apply)
+      + location            = "eastus"
+      + name                = "dev-vnet"
+      + resource_group_name = "dev-network-rg"
+    }
+
+  # azurerm_subnet.subnet["dev-subnet-1"] will be created
+  + resource "azurerm_subnet" "subnet" {
+      + address_prefixes     = ["10.0.1.0/24"]
+      + id                   = (known after apply)
+      + name                 = "dev-subnet-1"
+      + resource_group_name  = "dev-network-rg"
+      + virtual_network_name = "dev-vnet"
+    }
+
+  # azurerm_subnet.subnet["dev-subnet-2"] will be created
+  + resource "azurerm_subnet" "subnet" {
+      + address_prefixes     = ["10.0.2.0/24"]
+      + id                   = (known after apply)
+      + name                 = "dev-subnet-2"
+      + resource_group_name  = "dev-network-rg"
+      + virtual_network_name = "dev-vnet"
+    }
+
+  # azurerm_network_security_group.nsg will be created
+  + resource "azurerm_network_security_group" "nsg" {
+      + id                  = (known after apply)
+      + location            = "eastus"
+      + name                = "dev-vnet-nsg"
+      + resource_group_name = "dev-network-rg"
+
+      + security_rule {
+          + access                     = "Allow"
+          + direction                  = "Inbound"
+          + name                       = "AllowSSH"
+          + priority                   = 1001
+          + protocol                   = "Tcp"
+          + source_address_prefix      = "*"
+          + destination_address_prefix = "*"
+          + source_port_range          = "*"
+          + destination_port_range     = "22"
+        }
+    }
+
+  # azurerm_subnet_network_security_group_association.nsg_association["dev-subnet-1"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "nsg_association" {
+      + id                        = (known after apply)
+      + subnet_id                 = (known after apply)
+      + network_security_group_id = (known after apply)
+    }
+
+  # azurerm_subnet_network_security_group_association.nsg_association["dev-subnet-2"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "nsg_association" {
+      + id                        = (known after apply)
+      + subnet_id                 = (known after apply)
+      + network_security_group_id = (known after apply)
+    }
+
+Plan: 7 to add, 0 to change, 0 to destroy.
