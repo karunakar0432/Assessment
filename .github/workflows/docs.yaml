@@ -20,19 +20,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Terraform Docs
-        uses: terraform-docs/gh-actions@v1.0.0
+      - name: Generate docs using terraform-docs action
+        uses: terraform-docs/gh-actions@v1.4.0
         with:
-          version: latest
+          working-dir: terraform/modules
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
+          
+      # - name: Set up Terraform Docs
+      #   uses: terraform-docs/gh-actions@v1.0.0
+      #   with:
+      #     version: latest
 
-      - name: Generate docs for each module
-        run: |
-          MODULES=$(find terraform/modules -type d -maxdepth 1 -mindepth 1)
+      # - name: Generate docs for each module
+      #   run: |
+      #     MODULES=$(find terraform/modules -type d -maxdepth 1 -mindepth 1)
 
-          for module in $MODULES; do
-            echo "Generating docs for $module"
-            terraform-docs markdown table "$module" --output-file README.md --output-mode inject
-          done
+      #     for module in $MODULES; do
+      #       echo "Generating docs for $module"
+      #       terraform-docs markdown table "$module" --output-file README.md --output-mode inject
+      #     done
 
       - name: Commit changes
         run: |
