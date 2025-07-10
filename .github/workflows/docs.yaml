@@ -1,0 +1,43 @@
+name: Generate Terraform Docs
+
+on:
+  workflow_dispatch: 
+  # The trigger condition is below actually but made it as workflow_dispatch to stop auto trigger on commits
+  # push:
+  #   paths:
+  #     - 'terraform/**/*.tf'
+  #     - '.github/workflows/docs.yaml'
+  # pull_request:
+  #   paths:
+  #     - 'terraform/**/*.tf'
+
+jobs:
+  generate-docs:
+    name: Generate Terraform Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform Docs
+        uses: terraform-docs/gh-actions@v1.0.0
+        with:
+          version: latest
+
+      - name: Generate docs for each module
+        run: |
+          MODULES=$(find terraform/modules -type d -maxdepth 1 -mindepth 1)
+
+          for module in $MODULES; do
+            echo "Generating docs for $module"
+            terraform-docs markdown table "$module" --output-file README.md --output-mode inject
+          done
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add terraform/modules/*/README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore(docs): auto-update module docs"
+          git push
