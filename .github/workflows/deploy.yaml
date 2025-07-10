@@ -39,5 +39,5 @@ jobs:
       working-directory: ./terraform
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var-file=envs/${{ github.event.inputs.environment }}/environment.tfvars
+      run: terraform apply -var-file=envs/${{ github.event.inputs.environment }}/environment.tfvars
       working-directory: ./terraform
